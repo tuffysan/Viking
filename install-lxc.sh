@@ -15,7 +15,7 @@ TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-local}"
 LVMTHIN_MAX_DATA_PERCENT="${LVMTHIN_MAX_DATA_PERCENT:-80}"
 APP_PORT="${APP_PORT:-8080}"
 
-log() { printf '%s\n' "$*"; }
+log() { printf '%s\n' "$*" >&2; }
 die() { printf 'FEL: %s\n' "$*" >&2; exit 1; }
 
 [[ "$(id -u)" -eq 0 ]] || die "Kör installeraren som root på Proxmox-hosten."
@@ -138,6 +138,13 @@ choose_storage() {
 }
 
 SELECTED_STORAGE="$(choose_storage)"
+
+case "$SELECTED_STORAGE" in
+  local|local-lvm) ;;
+  *)
+    die "Ogiltigt storage-värde från storage-val: '$SELECTED_STORAGE'"
+    ;;
+esac
 
 get_template() {
   local existing template

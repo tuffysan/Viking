@@ -21,7 +21,7 @@ app.UseStaticFiles();
 
 var protector = app.Services.GetRequiredService<IDataProtectionProvider>().CreateProtector("VikingIPTV.AccountSecrets.v1");
 
-app.MapGet("/api/health", () => Results.Ok(new { status = "ok", app = "Viking IPTV", version = "1.7.6", hostname = Environment.MachineName, time = DateTimeOffset.UtcNow }));
+app.MapGet("/api/health", () => Results.Ok(new { status = "ok", app = "Viking IPTV", version = "1.7.7", hostname = Environment.MachineName, time = DateTimeOffset.UtcNow }));
 
 app.MapGet("/api/provider", () => Results.Ok(ProviderCatalog.Info));
 app.MapGet("/api/packages", () => Results.Ok(ProviderCatalog.Packages));

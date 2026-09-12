@@ -71,6 +71,17 @@ if ($publisher -match '\\Q|\\E') {
 
 $installer = Get-Content ".\install-lxc.sh" -Raw
 
+if ($installer -notmatch "log\(\) \{ printf '%s\\n' \"\$\*\" >&2; \}") {
+    Write-Host "ERROR: installer log output is not redirected to stderr." -ForegroundColor Red
+    exit 1
+}
+
+if ($installer -notmatch 'case "\$SELECTED_STORAGE" in') {
+    Write-Host "ERROR: selected storage sanity validation is missing." -ForegroundColor Red
+    exit 1
+}
+
+
 if ($installer -match '\$\{HOSTNAME:-') {
     Write-Host "ERROR: installer still uses HOSTNAME variable." -ForegroundColor Red
     exit 1
