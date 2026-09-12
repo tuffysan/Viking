@@ -7,10 +7,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0PUBLISH-RELEASE.ps
 set "RC=%ERRORLEVEL%"
 echo.
 if not "%RC%"=="0" (
-  echo Release-publiceringen misslyckades. Felkod: %RC%
+  echo Release publishing failed. Exit code: %RC%
   pause
   exit /b %RC%
 )
-echo Release-publiceringen ar klar.
+echo Release publishing completed successfully.
 pause
 endlocal

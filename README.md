@@ -1,6 +1,6 @@
 # Viking IPTV LXC
 
-Version **1.7.2**
+Version **1.7.4**
 
 Detta är den korrigerade releaseversionen. Ingen lokal GitHub-token ska ligga i projektet.
 
@@ -30,7 +30,7 @@ Kör sedan:
 5. reparerar den tidigare lokala blockerade v1.7.0-committen om den innehåller `PUBLISH-CONFIG.ps1`
 6. bygger .NET-projektet
 7. committar och pushar `main`
-8. skapar `v1.7.2`
+8. skapar `v1.7.4`
 9. skapar GitHub Release och laddar upp release-ZIP
 
 ## Repository
@@ -47,10 +47,10 @@ Senaste release:
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
 ```
 
-Exakt v1.7.2:
+Exakt v1.7.4:
 
 ```bash
-VERSION=1.7.2 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
+VERSION=1.7.4 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
 ```
 
 ## LXC
@@ -64,3 +64,28 @@ VERSION=1.7.2 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/V
 - `vmbr0`
 - .NET 10
 - port 8080
+
+
+## Proxmox-installation i v1.7.4
+
+Normal installation:
+
+```bash
+VERSION=1.7.4 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
+```
+
+Installeraren:
+- använder `CT_HOSTNAME=viking-iptv` och påverkas inte av Proxmox-hostens `HOSTNAME`
+- väljer automatiskt ett ledigt CTID
+- använder `local-lvm` bara när thin-poolen ligger under säkerhetsgränsen
+- faller annars tillbaka till `local`
+- aktiverar automatiskt `rootdir` på `local` och bevarar övriga content-typer
+- kontrollerar ledigt utrymme
+- försöker automatiskt med `local` om `local-lvm` ändå vägrar skapa volym
+
+Manuell override är fortfarande möjlig:
+
+```bash
+CTID=200 CT_HOSTNAME=viking-test STORAGE=local VERSION=1.7.4 \
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
+```
