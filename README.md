@@ -1,92 +1,106 @@
 # Viking IPTV LXC
 
-Version: **1.6.2**
+Version: **1.6.4**
 
-Komplett Proxmox LXC-projekt med GitHub Release-publicering.
+Detta paket innehåller allt som behövs för:
 
-## GitHub-konfiguration
+- lokal utveckling
+- verifiering
+- Git push
+- GitHub Release
+- release-ZIP
+- Proxmox LXC-installation
+- versionsspecifik installation
 
-Filen `PUBLISH-CONFIG.ps1` används lokalt för repository och token:
+## Viktiga filer
+
+```text
+PUBLISH-CONFIG.ps1
+PUBLISH-CONFIG.example.ps1
+PUBLISH-RELEASE.cmd
+PUBLISH-RELEASE.ps1
+VERIFY-PACKAGE.ps1
+install-lxc.sh
+update-from-github.sh
+VERSION
+app/
+```
+
+## 1. Fyll i GitHub-token
+
+Öppna:
+
+```powershell
+notepad .\PUBLISH-CONFIG.ps1
+```
+
+Standard:
 
 ```powershell
 $GitHubOwner = "tuffysan"
-$GitHubRepo  = "viking-iptv-lxc"
-$GitHubToken = "github_pat_..."
+$GitHubRepo  = "Viking"
+$GitHubToken = "PASTE_YOUR_GITHUB_TOKEN_HERE"
 ```
 
-`PUBLISH-CONFIG.ps1` ligger i `.gitignore` och ska aldrig publiceras till GitHub.
+Ersätt bara tokenvärdet.
 
-En säker mall finns som `PUBLISH-CONFIG.example.ps1`.
+`PUBLISH-CONFIG.ps1` är medvetet ignorerad av Git och ska inte pushas.
 
-## Rekommenderad token
-
-Använd en Fine-grained Personal Access Token begränsad till just repositoryt.
-
-Repository permission:
-
-```text
-Contents: Read and write
-```
-
-## Verifiera projektet
+## 2. Verifiera
 
 ```powershell
 .\VERIFY-PACKAGE.ps1
 ```
 
-## Skapa en GitHub Release
-
-1. Öppna `PUBLISH-CONFIG.ps1`.
-2. Ange owner, repository och token.
-3. Kör:
+## 3. Publicera release
 
 ```powershell
 .\PUBLISH-RELEASE.cmd
 ```
 
-Scriptet:
+Flödet:
 
-1. använder token endast i den aktuella processen
-2. verifierar token
-3. konfigurerar Git-autentisering via GitHub CLI
-4. pushar `main`
-5. skapar versionstaggen
-6. skapar release-ZIP
-7. skapar GitHub Release
-8. laddar upp releaseasseten
+1. verifierar release-token
+2. bygger .NET-projektet
+3. committar ändringar
+4. pushar `main` med din vanliga Git-inloggning
+5. skapar release-ZIP
+6. pushar versionstaggen med vanlig Git-inloggning
+7. skapar/uppdaterar GitHub Release med token
+8. visar färdigt Proxmox-installationskommando
 
-Token skrivs inte till releasepaketet.
+## 4. Proxmox
 
-## Installera senaste releasen i Proxmox
-
-När `install-lxc.sh` ligger på `main`:
+Senaste release:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/viking-iptv-lxc/main/install-lxc.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
 ```
 
-Installera exakt v1.6.2:
+Exakt v1.6.4:
 
 ```bash
-VERSION=1.6.2 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/viking-iptv-lxc/main/install-lxc.sh)"
+VERSION=1.6.4 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
 ```
 
-## Standardvärden
+## Standard för LXC
 
-- Hostname: `viking-iptv`
 - Debian 12
-- .NET 10
+- hostname `viking-iptv`
 - 2 CPU
 - 1024 MB RAM
 - 8 GB disk
-- Bridge: `vmbr0`
 - DHCP
-- Port: `8080`
+- `vmbr0`
+- .NET 10
+- webbport 8080
 
 ## Data
 
+Persistent data:
+
 ```text
-/var/lib/viking-iptv/data.json
+/var/lib/viking-iptv
 /var/lib/viking-iptv/keys
 ```
 
@@ -99,18 +113,4 @@ journalctl -u viking-iptv -f
 
 ## Säkerhet
 
-Lägg aldrig din riktiga GitHub-token i README, ett commit-meddelande eller någon fil som spåras av Git. Om en token råkar publiceras ska den återkallas direkt på GitHub och ersättas med en ny.
-
-
-## Fix i v1.6.2
-
-- `PUBLISH-RELEASE.cmd` använder nu Windows CRLF-radslut.
-- CMD-filen är ren ASCII för maximal kompatibilitet med `cmd.exe`.
-- PowerShell-scripten sparas med UTF-8 BOM så svenska tecken visas korrekt i Windows PowerShell 5.1.
-
-
-## Fix i v1.6.2
-
-- `PUBLISH-CONFIG.ps1` kan nu vara korrekt ignorerad utan att release-scriptet avbryts.
-- `git ls-files --error-unmatch` exit code 1 behandlas som normalt för en ospårad tokenfil.
-- Kontroll av befintlig GitHub Release hanterar nu också en saknad release utan att PowerShell stoppar.
+Lägg aldrig en riktig GitHub-token i README, commit-historik eller någon annan fil som spåras av Git.

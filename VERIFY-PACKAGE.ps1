@@ -38,4 +38,13 @@ if ($gitignore -notmatch '(?m)^PUBLISH-CONFIG\.ps1\s*$') {
 }
 
 Write-Host 'Token-konfigurationen är skyddad av .gitignore.' -ForegroundColor Green
-Write-Host 'Fyll i PUBLISH-CONFIG.ps1 och kör sedan .\PUBLISH-RELEASE.cmd.' -ForegroundColor Cyan
+
+. .\PUBLISH-CONFIG.ps1
+if (-not $GitHubToken -or $GitHubToken -eq 'PASTE_YOUR_GITHUB_TOKEN_HERE') {
+    Write-Host 'OBS: GitHub-token är ännu inte ifylld i PUBLISH-CONFIG.ps1.' -ForegroundColor Yellow
+} else {
+    Write-Host 'GitHub-token är ifylld.' -ForegroundColor Green
+}
+
+Write-Host "Repository: $GitHubOwner/$GitHubRepo" -ForegroundColor Cyan
+Write-Host 'Kör sedan .\PUBLISH-RELEASE.cmd.' -ForegroundColor Cyan

@@ -1,6 +1,4 @@
-﻿# Kopiera vid behov denna fil till PUBLISH-CONFIG.ps1.
-# PUBLISH-CONFIG.ps1 är ignorerad av Git.
-
+﻿# Exempelmall för lokal GitHub-konfiguration.
 $GitHubOwner = "tuffysan"
-$GitHubRepo  = "viking-iptv-lxc"
+$GitHubRepo  = "Viking"
 $GitHubToken = "PASTE_YOUR_GITHUB_TOKEN_HERE"
