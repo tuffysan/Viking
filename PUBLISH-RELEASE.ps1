@@ -231,9 +231,22 @@ Remove-Item $StagingDir -Recurse -Force
 Write-Host "Release asset: $AssetPath"
 
 Write-Host "[7/9] Creating and pushing tag..."
-& git tag -d $Tag *> $null
+& git rev-parse -q --verify "refs/tags/$Tag" *> $null
+$localTagExists = ($LASTEXITCODE -eq 0)
+
+if ($localTagExists) {
+    Invoke-Git -Args @("tag","-d",$Tag)
+}
+
+& git ls-remote --exit-code --tags origin "refs/tags/$Tag" *> $null
+$remoteTagExists = ($LASTEXITCODE -eq 0)
+
+if ($remoteTagExists) {
+    Invoke-Git -Args @("push","origin",":refs/tags/$Tag")
+}
+
 Invoke-Git -Args @("tag",$Tag)
-Invoke-Git -Args @("push","origin",$Tag,"--force")
+Invoke-Git -Args @("push","origin",$Tag)
 
 Write-Host "[8/9] Creating or updating GitHub Release..."
 & gh release view $Tag --repo $Repo *> $null

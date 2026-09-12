@@ -39,6 +39,16 @@ foreach ($b in $publisherBytes) {
 }
 
 $publisher = Get-Content ".\PUBLISH-RELEASE.ps1" -Raw
+
+if ($publisher -match '& git tag -d \$Tag \*> \$null') {
+    Write-Host "ERROR: unsafe tag deletion remains in publisher." -ForegroundColor Red
+    exit 1
+}
+if ($publisher -notmatch 'rev-parse -q --verify "refs/tags/\$Tag"') {
+    Write-Host "ERROR: safe local tag existence check is missing." -ForegroundColor Red
+    exit 1
+}
+
 if ($publisher -match '\$[A-Za-z_][A-Za-z0-9_]*:') {
     Write-Host "ERROR: unsafe PowerShell variable followed by colon found." -ForegroundColor Red
     exit 1
