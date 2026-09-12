@@ -40,6 +40,16 @@ foreach ($b in $publisherBytes) {
 
 $publisher = Get-Content ".\PUBLISH-RELEASE.ps1" -Raw
 
+if ($publisher -match '& gh release view \$Tag --repo \$Repo \*> \$null\r?\n\$releaseExists') {
+    Write-Host "ERROR: unsafe gh release view handling remains." -ForegroundColor Red
+    exit 1
+}
+if ($publisher -notmatch 'try \{\r?\n\s*& gh release view \$Tag --repo \$Repo') {
+    Write-Host "ERROR: safe gh release view handling is missing." -ForegroundColor Red
+    exit 1
+}
+
+
 if ($publisher -match '& git tag -d \$Tag \*> \$null') {
     Write-Host "ERROR: unsafe tag deletion remains in publisher." -ForegroundColor Red
     exit 1

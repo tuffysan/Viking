@@ -249,8 +249,20 @@ Invoke-Git -Args @("tag",$Tag)
 Invoke-Git -Args @("push","origin",$Tag)
 
 Write-Host "[8/9] Creating or updating GitHub Release..."
-& gh release view $Tag --repo $Repo *> $null
-$releaseExists = ($LASTEXITCODE -eq 0)
+
+$releaseExists = $false
+try {
+    & gh release view $Tag --repo $Repo *> $null
+    if ($LASTEXITCODE -eq 0) {
+        $releaseExists = $true
+    }
+}
+catch {
+    # GitHub CLI writes "release not found" to stderr. In Windows PowerShell 5.1
+    # that can be promoted to NativeCommandError even though this is an expected
+    # condition for a new release. Treat it as "release does not exist".
+    $releaseExists = $false
+}
 
 if ($releaseExists) {
     & gh release upload $Tag $AssetPath --repo $Repo --clobber

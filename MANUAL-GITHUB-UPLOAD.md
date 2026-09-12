@@ -1,4 +1,4 @@
-# Releaseguide – Viking IPTV v1.7.5
+# Releaseguide – Viking IPTV v1.7.6
 
 ## Viktigt
 
