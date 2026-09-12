@@ -5,8 +5,6 @@ $required = @(
   '.gitignore',
   'README.md',
   'MANUAL-GITHUB-UPLOAD.md',
-  'PUBLISH-CONFIG.ps1',
-  'PUBLISH-CONFIG.example.ps1',
   'PUBLISH-RELEASE.cmd',
   'PUBLISH-RELEASE.ps1',
   'VERIFY-PACKAGE.ps1',
@@ -21,30 +19,38 @@ $required = @(
 )
 
 $missing = $required | Where-Object { -not (Test-Path (Join-Path $PSScriptRoot $_)) }
-
 if ($missing) {
     Write-Host 'FEL: Paketet saknar:' -ForegroundColor Red
     $missing | ForEach-Object { Write-Host " - $_" }
     exit 1
 }
 
-$version = (Get-Content .\VERSION -Raw).Trim()
-Write-Host "Paket OK. Version $version" -ForegroundColor Green
-
-$gitignore = Get-Content .\.gitignore -Raw
-if ($gitignore -notmatch '(?m)^PUBLISH-CONFIG\.ps1\s*$') {
-    Write-Host 'FEL: PUBLISH-CONFIG.ps1 saknas i .gitignore.' -ForegroundColor Red
+if (Test-Path '.\PUBLISH-CONFIG.ps1') {
+    Write-Host 'FEL: PUBLISH-CONFIG.ps1 ska inte finnas i v1.7.1.' -ForegroundColor Red
     exit 1
 }
 
-Write-Host 'Token-konfigurationen är skyddad av .gitignore.' -ForegroundColor Green
+$version = (Get-Content .\VERSION -Raw).Trim()
 
-. .\PUBLISH-CONFIG.ps1
-if (-not $GitHubToken -or $GitHubToken -eq 'PASTE_YOUR_GITHUB_TOKEN_HERE') {
-    Write-Host 'OBS: GitHub-token är ännu inte ifylld i PUBLISH-CONFIG.ps1.' -ForegroundColor Yellow
-} else {
-    Write-Host 'GitHub-token är ifylld.' -ForegroundColor Green
+$publisher = Get-Content '.\PUBLISH-RELEASE.ps1' -Raw
+
+# Known PowerShell interpolation trap: "$Variable:" must use "${Variable}:"
+if ($publisher -match '\$[A-Za-z_][A-Za-z0-9_]*:') {
+    Write-Host 'FEL: Möjlig ogiltig PowerShell-variabel följd av kolon hittades i PUBLISH-RELEASE.ps1.' -ForegroundColor Red
+    exit 1
 }
 
-Write-Host "Repository: $GitHubOwner/$GitHubRepo" -ForegroundColor Cyan
-Write-Host 'Kör sedan .\PUBLISH-RELEASE.cmd.' -ForegroundColor Cyan
+# .NET regular expressions do not support \Q...\E quoting.
+if ($publisher -match '\\Q|\\E') {
+    Write-Host 'FEL: PUBLISH-RELEASE.ps1 innehåller \Q eller \E som inte stöds av .NET-regex.' -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "Paket OK. Version $version" -ForegroundColor Green
+Write-Host 'Ingen tokenfil används.' -ForegroundColor Green
+Write-Host 'Publish-scriptet rensar gamla GITHUB_TOKEN/GH_TOKEN från processen.' -ForegroundColor Green
+Write-Host 'Publish-scriptet skyddar mot GitHub-token i projekt/staged diff.' -ForegroundColor Green
+Write-Host 'Publish-scriptet kan reparera blockerad lokal v1.7.0-commit.
+Write-Host 'Kända PowerShell-parserfel kontrollerade.' -ForegroundColor Green' -ForegroundColor Green
+Write-Host ''
+Write-Host 'Kör nu: .\PUBLISH-RELEASE.cmd' -ForegroundColor Cyan

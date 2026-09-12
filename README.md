@@ -1,75 +1,45 @@
 # Viking IPTV LXC
 
-Version: **1.6.4**
+Version **1.7.2**
 
-Detta paket innehåller allt som behövs för:
+Detta är den korrigerade releaseversionen. Ingen lokal GitHub-token ska ligga i projektet.
 
-- lokal utveckling
-- verifiering
-- Git push
-- GitHub Release
-- release-ZIP
-- Proxmox LXC-installation
-- versionsspecifik installation
+## Publicera
 
-## Viktiga filer
-
-```text
-PUBLISH-CONFIG.ps1
-PUBLISH-CONFIG.example.ps1
-PUBLISH-RELEASE.cmd
-PUBLISH-RELEASE.ps1
-VERIFY-PACKAGE.ps1
-install-lxc.sh
-update-from-github.sh
-VERSION
-app/
-```
-
-## 1. Fyll i GitHub-token
-
-Öppna:
+Förutsättning:
 
 ```powershell
-notepad .\PUBLISH-CONFIG.ps1
+gh auth status
 ```
 
-Standard:
+Du ska vara inloggad som `tuffysan`.
 
-```powershell
-$GitHubOwner = "tuffysan"
-$GitHubRepo  = "Viking"
-$GitHubToken = "PASTE_YOUR_GITHUB_TOKEN_HERE"
-```
-
-Ersätt bara tokenvärdet.
-
-`PUBLISH-CONFIG.ps1` är medvetet ignorerad av Git och ska inte pushas.
-
-## 2. Verifiera
+Kör sedan:
 
 ```powershell
 .\VERIFY-PACKAGE.ps1
-```
-
-## 3. Publicera release
-
-```powershell
 .\PUBLISH-RELEASE.cmd
 ```
 
-Flödet:
+`PUBLISH-RELEASE.ps1` gör automatiskt följande:
 
-1. verifierar release-token
-2. bygger .NET-projektet
-3. committar ändringar
-4. pushar `main` med din vanliga Git-inloggning
-5. skapar release-ZIP
-6. pushar versionstaggen med vanlig Git-inloggning
-7. skapar/uppdaterar GitHub Release med token
-8. visar färdigt Proxmox-installationskommando
+1. tar bort gamla `GITHUB_TOKEN` och `GH_TOKEN` från den aktuella processen
+2. använder din befintliga GitHub CLI keyring-inloggning
+3. tar bort en gammal `PUBLISH-CONFIG.ps1` om den ligger kvar lokalt
+4. stoppar publiceringen om en GitHub-token hittas i projektet
+5. reparerar den tidigare lokala blockerade v1.7.0-committen om den innehåller `PUBLISH-CONFIG.ps1`
+6. bygger .NET-projektet
+7. committar och pushar `main`
+8. skapar `v1.7.2`
+9. skapar GitHub Release och laddar upp release-ZIP
 
-## 4. Proxmox
+## Repository
+
+```text
+https://github.com/tuffysan/Viking
+```
+
+## Proxmox
 
 Senaste release:
 
@@ -77,13 +47,13 @@ Senaste release:
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
 ```
 
-Exakt v1.6.4:
+Exakt v1.7.2:
 
 ```bash
-VERSION=1.6.4 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
+VERSION=1.7.2 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/Viking/main/install-lxc.sh)"
 ```
 
-## Standard för LXC
+## LXC
 
 - Debian 12
 - hostname `viking-iptv`
@@ -93,24 +63,4 @@ VERSION=1.6.4 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/V
 - DHCP
 - `vmbr0`
 - .NET 10
-- webbport 8080
-
-## Data
-
-Persistent data:
-
-```text
-/var/lib/viking-iptv
-/var/lib/viking-iptv/keys
-```
-
-## Systemd
-
-```bash
-systemctl status viking-iptv
-journalctl -u viking-iptv -f
-```
-
-## Säkerhet
-
-Lägg aldrig en riktig GitHub-token i README, commit-historik eller någon annan fil som spåras av Git.
+- port 8080

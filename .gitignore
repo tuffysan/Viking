@@ -4,7 +4,12 @@ publish/
 .vs/
 *.user
 *.suo
-PUBLISH-CONFIG.ps1
 release/
 **/bin/
 **/obj/
+
+# Never commit local credentials / old publish config
+PUBLISH-CONFIG.ps1
+PUBLISH-CONFIG*.local.ps1
+.env
+.env.*

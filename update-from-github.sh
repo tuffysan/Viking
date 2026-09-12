@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 APP_DIR=/opt/viking-iptv-src
-REPO_URL="${REPO_URL:-https://github.com/tuffysan/viking-iptv-lxc.git}"
+REPO_URL="${REPO_URL:-https://github.com/tuffysan/Viking.git}"
 BRANCH="${BRANCH:-main}"
 if [[ ! -d "$APP_DIR/.git" ]]; then rm -rf "$APP_DIR"; git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"; else cd "$APP_DIR"; git fetch origin "$BRANCH"; git reset --hard "origin/$BRANCH"; fi
 cd "$APP_DIR/app"

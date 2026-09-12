@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="${REPO:-tuffysan/viking-iptv-lxc}"
+REPO="${REPO:-tuffysan/Viking}"
 VERSION="${VERSION:-latest}"
 CTID="${CTID:-$(pvesh get /cluster/nextid)}"
 HOSTNAME="${HOSTNAME:-viking-iptv}"
