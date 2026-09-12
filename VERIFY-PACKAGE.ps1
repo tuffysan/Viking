@@ -1,10 +1,12 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 
 $required = @(
   '.gitignore',
   'README.md',
   'MANUAL-GITHUB-UPLOAD.md',
+  'PUBLISH-CONFIG.ps1',
+  'PUBLISH-CONFIG.example.ps1',
   'PUBLISH-RELEASE.cmd',
   'PUBLISH-RELEASE.ps1',
   'VERIFY-PACKAGE.ps1',
@@ -28,4 +30,12 @@ if ($missing) {
 
 $version = (Get-Content .\VERSION -Raw).Trim()
 Write-Host "Paket OK. Version $version" -ForegroundColor Green
-Write-Host 'Kör .\PUBLISH-RELEASE.cmd för att skapa GitHub Release.' -ForegroundColor Cyan
+
+$gitignore = Get-Content .\.gitignore -Raw
+if ($gitignore -notmatch '(?m)^PUBLISH-CONFIG\.ps1\s*$') {
+    Write-Host 'FEL: PUBLISH-CONFIG.ps1 saknas i .gitignore.' -ForegroundColor Red
+    exit 1
+}
+
+Write-Host 'Token-konfigurationen är skyddad av .gitignore.' -ForegroundColor Green
+Write-Host 'Fyll i PUBLISH-CONFIG.ps1 och kör sedan .\PUBLISH-RELEASE.cmd.' -ForegroundColor Cyan

@@ -1,88 +1,58 @@
-# Publicera projektet manuellt till GitHub
+# Manuell GitHub-start och release-publicering
 
 Repository:
 
-https://github.com/tuffysan/viking-iptv-lxc
+`https://github.com/tuffysan/viking-iptv-lxc`
 
-## Alternativ A - GitHub webbsida
+## Första uppladdningen
 
-1. Logga in på GitHub.
-2. Skapa repositoryt `viking-iptv-lxc` under kontot `tuffysan` om det inte redan finns.
-3. Öppna repositoryt.
-4. Välj **Add file** -> **Upload files**.
-5. Dra in alla filer och mappar från den här projektmappen.
-6. Skriv exempelvis commit-meddelandet:
+Du kan skapa repositoryt på GitHub och lägga upp projektet manuellt eller med Git.
 
-   `Viking IPTV v1.5.0`
+Viktigt: `PUBLISH-CONFIG.ps1` innehåller din lokala token och är medvetet ignorerad av Git.
 
-7. Välj **Commit changes**.
-
-Viktigt: GitHub-webbuppladdning kan vara mindre smidig för många filer och mappar. Om webbläsaren inte tar emot hela strukturen, använd Git-klient enligt Alternativ B.
-
-## Alternativ B - vanlig Git från PowerShell
-
-Öppna PowerShell i projektmappen:
+Kontrollera:
 
 ```powershell
-cd "C:\Users\andreas.nilsson\Documents\GitHub\viking-iptv-lxc"
+git status
 ```
 
-Initiera Git om `.git` saknas:
+`PUBLISH-CONFIG.ps1` ska inte finnas bland filer som kommer att committas.
+
+## Publicera nya versioner
+
+Redigera:
+
+```text
+PUBLISH-CONFIG.ps1
+```
+
+Exempel:
 
 ```powershell
-git init
-git branch -M main
+$GitHubOwner = "tuffysan"
+$GitHubRepo  = "viking-iptv-lxc"
+$GitHubToken = "github_pat_..."
 ```
 
-Lägg till GitHub-repositoryt:
+Kör sedan:
 
 ```powershell
-git remote add origin https://github.com/tuffysan/viking-iptv-lxc.git
+.\VERIFY-PACKAGE.ps1
+.\PUBLISH-RELEASE.cmd
 ```
 
-Om `origin` redan finns:
+Release-scriptet använder token för Git-push och GitHub Release och återställer processens tidigare tokenmiljö när körningen är klar.
 
-```powershell
-git remote set-url origin https://github.com/tuffysan/viking-iptv-lxc.git
-```
+## Proxmox
 
-Lägg till och committa:
-
-```powershell
-git add .
-git commit -m "Viking IPTV v1.5.0"
-```
-
-Pusha:
-
-```powershell
-git push -u origin main
-```
-
-Om Git frågar efter autentisering används normalt Git Credential Manager eller webbinloggning.
-
-## Installera i Proxmox efter publicering
-
-Kör som `root` på Proxmox:
+Senaste release:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/viking-iptv-lxc/main/install-lxc.sh)"
 ```
 
-Exempel med eget CTID:
+Specifik version:
 
 ```bash
-CTID=165 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/viking-iptv-lxc/main/install-lxc.sh)"
+VERSION=1.6.2 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tuffysan/viking-iptv-lxc/main/install-lxc.sh)"
 ```
-
-
-## Skapa release efter första uppladdningen
-
-När repositoryt finns på GitHub och GitHub CLI är inloggad:
-
-```powershell
-gh auth status
-.\PUBLISH-RELEASE.cmd
-```
-
-Detta skapar en riktig GitHub Release med ett ZIP-asset som Proxmox-installern kan hämta.
